@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>請求書作成画面</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* .content 内限定で余白を設定 */
+    .content {
+      margin: 40px;
+    }
+    h1 {
+      text-align: center;
+    }
+    nav {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #00B4D2;
+      font-weight: bold;
+    }
+    form {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    .actions {
+      margin-top: 20px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+    .total {
+      text-align: right;
+      margin-top: 15px;
+      font-size: 1.1em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1>請求書作成画面</h1>
+
+<form id="invoice-form">
+
+  <label for="client">請求先情報</label>
+  <select id="client" name="client">
+    <option value="">取引先を選択</option>
+    <option value="clientA">株式会社 A</option>
+    <option value="clientB">株式会社 B</option>
+  </select>
+
+  <label for="invoice-date">請求日</label>
+  <input type="date" id="invoice-date" name="invoice-date">
+
+  <label for="due-date">支払期限</label>
+  <input type="date" id="due-date" name="due-date">
+
+  <label for="invoice-number">請求番号</label>
+  <input type="text" id="invoice-number" name="invoice-number" placeholder="例：INV-2025-0001">
+
+  <label for="issuer">請求者情報</label>
+  <select id="issuer" name="issuer">
+    <option value="">請求者を選択</option>
+    <option value="issuerA">株式会社 請求者A</option>
+    <option value="issuerB">株式会社 請求者B</option>
+  </select>
+
+  <table id="item-table">
+    <thead>
+      <tr>
+        <th>商品・サービス名</th>
+        <th>単価（税込）</th>
+        <th>税率</th>
+        <th>小計</th>
+        <th>操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="text" name="item-name[]" placeholder="例：デザイン作業"></td>
+        <td><input type="number" name="item-price[]" value="0"></td>
+        <td>
+          <select name="item-tax[]">
+            <option value="0.10">10%</option>
+            <option value="0.08">8%</option>
+            <option value="0.00">0%</option>
+            <option value="non-taxable">非課税</option>
+          </select>
+        </td>
+        <td class="subtotal">¥0</td>
+        <td><button type="button" onclick="removeRow(this)">削除</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button type="button" onclick="addRow()">+ 項目追加</button>
+
+  <div class="total">合計金額：<span id="total">¥0</span></div>
+
+  <label for="notes">メモ・備考欄</label>
+  <textarea id="notes" name="notes" rows="4"></textarea>
+
+  <div class="actions">
+    <button type="button" onclick="previewInvoice()">プレビュー</button>
+    <button type="submit">保存して送信</button>
+    <button type="button">下書き保存</button>
+  </div>
+
+</form>
+
+<script>
+  const table = document.getElementById('item-table').getElementsByTagName('tbody')[0];
+
+  function addRow() {
+    const newRow = table.rows[0].cloneNode(true);
+    newRow.querySelectorAll('input').forEach(input => input.value = '');
+    newRow.querySelector('.subtotal').textContent = '¥0';
+    table.appendChild(newRow);
+  }
+
+  function removeRow(button) {
+    if (table.rows.length > 1) {
+      button.parentElement.parentElement.remove();
+      updateTotal();
+    }
+  }
+
+  function updateTotal() {
+    let total = 0;
+    Array.from(table.rows).forEach(row => {
+      const price = parseFloat(row.querySelector('input[name="item-price[]"]').value) || 0;
+      const taxRate = row.querySelector('select[name="item-tax[]"]').value;
+      let subtotal = 0;
+      if (taxRate !== 'non-taxable') {
+        subtotal = price * (1 + parseFloat(taxRate));
+      } else {
+        subtotal = price;
+      }
+      row.querySelector('.subtotal').textContent = '¥' + subtotal.toLocaleString();
+      total += subtotal;
+    });
+    document.getElementById('total').textContent = '¥' + total.toLocaleString();
+  }
+
+  table.addEventListener('input', updateTotal);
+
+  function previewInvoice() {
+    alert('プレビュー機能は今後実装します！');
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>請求書システム</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0 !important;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      height: 100vh;
+    }
+
+    .layout {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      flex-shrink: 0;
+      width: 220px;
+      background: #162533;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .sidebar h2 {
+      margin-bottom: 20px;
+    }
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      margin-bottom: 15px;
+      display: block;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+    .content {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+
+<div class="sidebar">
+  <h2>メニュー</h2>
+  <a onclick="navigate('home')">ホーム</a>
+  <a onclick="navigate('invoices')">請求書</a>
+  <a onclick="navigate('clients')">取引先</a>
+  <a onclick="navigate('settings')">設定</a>
+  <a onclick="navigate('logout')">ログアウト</a>
+</div>
+
+<div class="content" id="main-content">
+  <h1>ホーム</h1>
+  <p>こちらはダッシュボードです。メニューからページを選択してください。</p>
+</div>
+
+<script>
+function navigate(page) {
+  const content = document.getElementById('main-content');
+  if (page === 'home') {
+    content.innerHTML = '<h1>ホーム</h1><p>こちらはダッシュボードです。メニューからページを選択してください。</p>';
+  } else if (page === 'invoices') {
+    loadPage('invoices.html');
+  } else if (page === 'clients') {
+    loadPage('contact-group.html');
+  } else if (page === 'settings') {
+    loadPage('edit.html');
+  } else if (page === 'new') {
+    loadPage('new.html');
+  } else {
+    content.innerHTML = `<h1>${page} ページ</h1><p>このページは準備中です。</p>`;
+  }
+}
+
+function loadPage(url) {
+  fetch(url)
+    .then(response => response.text())
+    .then(html => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // headの中のstyleやlinkを追加
+      const headElements = doc.head.querySelectorAll('style, link[rel="stylesheet"]');
+      headElements.forEach(el => {
+        document.head.appendChild(el.cloneNode(true));
+      });
+
+      // bodyの中身を反映
+      const mainContent = doc.querySelector('body');
+      document.getElementById('main-content').innerHTML = mainContent.innerHTML;
+    })
+    .catch(error => {
+      console.error('ページ読み込みエラー:', error);
+      document.getElementById('main-content').innerHTML = '<p>ページの読み込みに失敗しました。</p>';
+    });
+}
+</script>
+
+  </div>
+</body>
+</html>
