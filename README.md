@@ -1,1 +1,28 @@
-# invoice-system
+# 請求書システム
+
+このプロジェクトは請求書作成・一覧管理のウェブアプリです。  
+静的サイトとして GitHub Pages で公開しています。
+
+## URL
+
+https://yourusername.github.io/your-repository-name/
+
+## 機能一覧
+
+- 請求書一覧の表示
+- 請求書作成画面
+- 取引先管理画面
+- 設定画面
+- メニュー切り替えで各画面表示
+- CSV ダウンロード機能
+
+## 使用技術
+
+- HTML / CSS / JavaScript
+- GitHub Pages でホスティング
+
+## 注意
+
+このサイトは限定公開用途です。  
+検索エンジンには表示されないよう設定されています。
+
