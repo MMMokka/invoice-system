@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <title>請求書システム</title>
   <style>
     body {
@@ -51,6 +52,13 @@
     h1 {
       text-align: center;
     }
+    #main-content {
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+    #main-content.fade-out {
+      opacity: 0;
+    }
   </style>
 </head>
 <body>
@@ -68,13 +76,31 @@
 <div class="content" id="main-content">
   <h1>ホーム</h1>
   <p>こちらはダッシュボードです。メニューからページを選択してください。</p>
+
+  <div class="dashboard-buttons" style="display: flex; gap: 20px; justify-content: flex-start; margin-top: 40px; padding-left: 20px;">
+    <button onclick="navigate('invoices')" style="width: 120px; height: 120px; background: white; border: 2px solid #00B4D2; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+      <span class="material-icons" style="font-size: 48px; color: #00B4D2;">receipt_long</span>
+      <span style="color: #00B4D2; margin-top: 8px;">請求書</span>
+    </button>
+
+    <button onclick="navigate('clients')" style="width: 120px; height: 120px; background: white; border: 2px solid #00B4D2; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+      <span class="material-icons" style="font-size: 48px; color: #00B4D2;">business</span>
+      <span style="color: #00B4D2; margin-top: 8px;">取引先</span>
+    </button>
+
+    <button onclick="navigate('settings')" style="width: 120px; height: 120px; background: white; border: 2px solid #00B4D2; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+      <span class="material-icons" style="font-size: 48px; color: #00B4D2;">settings</span>
+      <span style="color: #00B4D2; margin-top: 8px;">設定</span>
+    </button>
+  </div>
 </div>
+
 
 <script>
 function navigate(page) {
   const content = document.getElementById('main-content');
   if (page === 'home') {
-    content.innerHTML = '<h1>ホーム</h1><p>こちらはダッシュボードです。メニューからページを選択してください。</p>';
+    loadPage('home.html');
   } else if (page === 'invoices') {
     loadPage('invoices.html');
   } else if (page === 'clients') {
@@ -82,46 +108,60 @@ function navigate(page) {
   } else if (page === 'settings') {
     loadPage('edit.html');
   } else if (page === 'new') {
-    loadPage('new.html');
+    loadPage('new.html'); // ✅ 追加！
   } else {
     content.innerHTML = `<h1>${page} ページ</h1><p>このページは準備中です。</p>`;
   }
 }
 
 function loadPage(url) {
-  fetch(url)
-    .then(response => response.text())
-    .then(html => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
+  const content = document.getElementById('main-content');
 
-      // head の style / link を追加
-      const headElements = doc.head.querySelectorAll('style, link[rel="stylesheet"]');
-      headElements.forEach(el => {
-        document.head.appendChild(el.cloneNode(true));
+  // フェードアウト
+  content.classList.add('fade-out');
+
+  // 少し待ってからページを読み込む
+  setTimeout(() => {
+    fetch(url)
+      .then(response => response.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // head の style / link を追加
+        const headElements = doc.head.querySelectorAll('style, link[rel="stylesheet"]');
+        headElements.forEach(el => {
+          document.head.appendChild(el.cloneNode(true));
+        });
+
+        // body の中身を挿入
+        const mainContent = doc.querySelector('body');
+        const contentElement = document.getElementById('main-content');
+        contentElement.innerHTML = mainContent.innerHTML;
+
+        // script タグを動的に実行
+        const scripts = doc.querySelectorAll('script');
+        scripts.forEach(script => {
+          const newScript = document.createElement('script');
+          if (script.src) {
+            newScript.src = script.src;
+          } else {
+            newScript.textContent = script.textContent;
+          }
+          document.body.appendChild(newScript);
+        });
+
+        // 読み込み完了後にフェードイン
+        setTimeout(() => {
+          content.classList.remove('fade-out');
+        }, 50);
+      })
+      .catch(error => {
+        console.error('ページ読み込みエラー:', error);
+        content.innerHTML = '<p>ページの読み込みに失敗しました。</p>';
+        content.classList.remove('fade-out');
       });
-
-      // body の中身を挿入
-      const mainContent = doc.querySelector('body');
-      const contentElement = document.getElementById('main-content');
-      contentElement.innerHTML = mainContent.innerHTML;
-
-      // script タグを動的に実行
-      const scripts = doc.querySelectorAll('script');
-      scripts.forEach(script => {
-        const newScript = document.createElement('script');
-        if (script.src) {
-          newScript.src = script.src;
-        } else {
-          newScript.textContent = script.textContent;
-        }
-        document.body.appendChild(newScript);
-      });
-    })
-    .catch(error => {
-      console.error('ページ読み込みエラー:', error);
-      document.getElementById('main-content').innerHTML = '<p>ページの読み込みに失敗しました。</p>';
-    });
+  }, 200); // フェードアウト待ち時間
 }
 
 </script>
