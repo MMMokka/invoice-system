@@ -15,6 +15,7 @@
     /* .content 内限定で余白を設定 */
     .content {
       margin: 40px;
+      position: relative;
     }
     h1 {
       text-align: center;
@@ -215,6 +216,8 @@
 </div>
 
 <script>
+  const container = document.getElementById('main-content');
+
   function toggleInvoiceStatus(button) {
     button.textContent = button.textContent.trim() === '未請求' ? '請求済' : '未請求';
     button.classList.toggle('done');
@@ -234,19 +237,21 @@
   }
 
   function toggleAllCheckboxes(masterCheckbox) {
-    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+    const checkboxes = container.querySelectorAll('tbody input[type="checkbox"]');
     checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
     toggleFooterMenu();
   }
 
   function toggleFooterMenu() {
-    const checked = document.querySelectorAll('tbody input[type="checkbox"]:checked');
-    const footerMenu = document.getElementById('footer-menu');
-    footerMenu.classList.toggle('show', checked.length > 0);
+    const checked = container.querySelectorAll('tbody input[type="checkbox"]:checked');
+    const footerMenu = container.querySelector('#footer-menu');
+    if (footerMenu) {
+      footerMenu.classList.toggle('show', checked.length > 0);
+    }
   }
 
   function batchChangeStatus(action) {
-    const rows = document.querySelectorAll('tbody tr');
+    const rows = container.querySelectorAll('tbody tr');
     rows.forEach(row => {
       const checkbox = row.querySelector('input[type="checkbox"]');
       if (checkbox.checked) {
@@ -265,11 +270,14 @@
         }
       }
     });
-    document.getElementById('footer-menu').classList.remove('show');
+    const footerMenu = container.querySelector('#footer-menu');
+    if (footerMenu) {
+      footerMenu.classList.remove('show');
+    }
   }
 
   function filterStatus(filter) {
-    const rows = document.querySelectorAll('tbody tr');
+    const rows = container.querySelectorAll('tbody tr');
     rows.forEach(row => {
       const paymentBtn = row.querySelector('.status-payment');
       if (filter === 'unprocessed' && paymentBtn.textContent.trim() === '未入金') {
@@ -284,6 +292,5 @@
     });
   }
 </script>
-
 </body>
 </html>

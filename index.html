@@ -95,21 +95,35 @@ function loadPage(url) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
-      // headの中のstyleやlinkを追加
+      // head の style / link を追加
       const headElements = doc.head.querySelectorAll('style, link[rel="stylesheet"]');
       headElements.forEach(el => {
         document.head.appendChild(el.cloneNode(true));
       });
 
-      // bodyの中身を反映
+      // body の中身を挿入
       const mainContent = doc.querySelector('body');
-      document.getElementById('main-content').innerHTML = mainContent.innerHTML;
+      const contentElement = document.getElementById('main-content');
+      contentElement.innerHTML = mainContent.innerHTML;
+
+      // script タグを動的に実行
+      const scripts = doc.querySelectorAll('script');
+      scripts.forEach(script => {
+        const newScript = document.createElement('script');
+        if (script.src) {
+          newScript.src = script.src;
+        } else {
+          newScript.textContent = script.textContent;
+        }
+        document.body.appendChild(newScript);
+      });
     })
     .catch(error => {
       console.error('ページ読み込みエラー:', error);
       document.getElementById('main-content').innerHTML = '<p>ページの読み込みに失敗しました。</p>';
     });
 }
+
 </script>
 
   </div>
