@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>請求書一覧</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* .content 内限定で余白を設定 */
+    .content {
+      margin: 40px;
+    }
+    h1 {
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    nav button {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #00B4D2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    .status-bar, .search-bar {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .search-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .filter-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-buttons button {
+      padding: 5px 10px;
+      border: 1px solid #00B4D2;
+      background: white;
+      color: #00B4D2;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      margin-bottom: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #f0f0f0;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .controls select, .controls button {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .status-container {
+      display: flex;
+      gap: 8px;
+    }
+    .status-item {
+      cursor: pointer;
+      border: 1px solid;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-size: 0.9em;
+      transition: background-color 0.3s, color 0.3s;
+      background-color: white;
+      color: black;
+    }
+    .status-invoice.done, .status-payment.done {
+      background-color: #00B4D2;
+      color: white;
+      border: none;
+    }
+    .footer-menu {
+      position: fixed;
+      bottom: -100px;
+      left: 0;
+      right: 0;
+      background: white;
+      box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      border-top: 2px solid #ddd;
+      transition: bottom 0.3s ease;
+    }
+    .footer-menu.show {
+      bottom: 0;
+    }
+    .footer-menu button {
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: 1px solid #00B4D2;
+      background: white;
+      color: #00B4D2;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>請求書一覧</h1>
+
+<nav>
+  <div></div>
+  <button onclick="navigate('new')">請求書を新しく作る</button>
+</nav>
+
+
+<div class="status-bar">
+  <div>■ 未入金状況<br>過去一年間の未入金合計: ¥0 （0件）<br>期限超過の金額合計: ¥0 （0件）</div>
+</div>
+
+<div class="search-bar">
+  <div>■ 請求書検索</div>
+  <input type="text" placeholder="取引先名, 請求書番号, 件名, メモ">
+
+  <div class="filter-buttons">
+    <button onclick="filterStatus('unprocessed')">未処理</button>
+    <button onclick="filterStatus('processed')">処理済</button>
+    <button onclick="filterStatus('trash')">ゴミ箱</button>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th><input type="checkbox" onchange="toggleAllCheckboxes(this)"></th>
+      <th>ステータス</th>
+      <th>文書</th>
+      <th>請求日</th>
+      <th>お支払い期限（入金日）</th>
+      <th>金額</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><input type="checkbox" onchange="toggleFooterMenu()"></td>
+      <td>
+        <div class="status-container">
+          <button class="status-item status-invoice" onclick="toggleInvoiceStatus(this)">未請求</button>
+          <button class="status-item status-payment" onclick="togglePaymentStatus(this)">未入金</button>
+        </div>
+      </td>
+      <td>株式会社サンプル</td>
+      <td>2025-04-11</td>
+      <td>2025-05-10</td>
+      <td>¥100,000</td>
+    </tr>
+    <tr>
+      <td><input type="checkbox" onchange="toggleFooterMenu()"></td>
+      <td>
+        <div class="status-container">
+          <button class="status-item status-invoice done" onclick="toggleInvoiceStatus(this)">請求済</button>
+          <button class="status-item status-payment done" onclick="togglePaymentStatus(this)">入金済</button>
+        </div>
+      </td>
+      <td>株式会社テスト</td>
+      <td>2025-04-05</td>
+      <td>2025-05-05</td>
+      <td>¥200,000</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="controls">
+  <div>
+    表示件数：
+    <select>
+      <option>30</option>
+      <option>50</option>
+      <option>100</option>
+    </select>
+  </div>
+  <button>CSVダウンロード</button>
+</div>
+
+<div class="footer-menu" id="footer-menu">
+  <button onclick="batchChangeStatus('status-change')">ステータス変更</button>
+  <button onclick="batchChangeStatus('processed')">処理済</button>
+  <button onclick="batchChangeStatus('trash')">ごみ箱</button>
+</div>
+
+<script>
+  function toggleInvoiceStatus(button) {
+    button.textContent = button.textContent.trim() === '未請求' ? '請求済' : '未請求';
+    button.classList.toggle('done');
+  }
+
+  function togglePaymentStatus(button) {
+    if (button.textContent.trim() === '未入金') {
+      button.textContent = '入金済';
+      button.classList.add('done');
+    } else if (button.textContent.trim() === '入金済') {
+      const confirmChange = confirm('ステータスを未入金に変更すると、保存済みの入金日が削除されます。');
+      if (confirmChange) {
+        button.textContent = '未入金';
+        button.classList.remove('done');
+      }
+    }
+  }
+
+  function toggleAllCheckboxes(masterCheckbox) {
+    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+    toggleFooterMenu();
+  }
+
+  function toggleFooterMenu() {
+    const checked = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+    const footerMenu = document.getElementById('footer-menu');
+    footerMenu.classList.toggle('show', checked.length > 0);
+  }
+
+  function batchChangeStatus(action) {
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+      const checkbox = row.querySelector('input[type="checkbox"]');
+      if (checkbox.checked) {
+        const invoiceBtn = row.querySelector('.status-invoice');
+        const paymentBtn = row.querySelector('.status-payment');
+        if (action === 'processed') {
+          invoiceBtn.textContent = '請求済';
+          invoiceBtn.classList.add('done');
+          paymentBtn.textContent = '入金済';
+          paymentBtn.classList.add('done');
+        } else if (action === 'trash') {
+          row.style.display = 'none';
+        } else if (action === 'status-change') {
+          toggleInvoiceStatus(invoiceBtn);
+          togglePaymentStatus(paymentBtn);
+        }
+      }
+    });
+    document.getElementById('footer-menu').classList.remove('show');
+  }
+
+  function filterStatus(filter) {
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+      const paymentBtn = row.querySelector('.status-payment');
+      if (filter === 'unprocessed' && paymentBtn.textContent.trim() === '未入金') {
+        row.style.display = '';
+      } else if (filter === 'processed' && paymentBtn.textContent.trim() === '入金済') {
+        row.style.display = '';
+      } else if (filter === 'trash' && row.style.display === 'none') {
+        row.style.display = '';
+      } else if (filter !== 'trash') {
+        row.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+</body>
+</html>

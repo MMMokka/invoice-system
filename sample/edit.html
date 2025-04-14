@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>自社情報入力フォーム</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: #fff;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      font-weight: bold;
+    }
+    main {
+  flex: 1;
+  padding: 20px;
+}
+    section {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      margin-top: 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      max-width: 400px;
+    }
+    input[type="text"],
+    input[type="tel"],
+    input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .small-note {
+      display: block;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .postal-code-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 400px;
+    }
+    .postal-code-wrapper input {
+      width: 120px;
+    }
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    button {
+      background-color: #00B4D2;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button.add-account {
+      background: none;
+      color: #00B4D2;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 220px; /* 左カラムの幅分 */
+      width: calc(100% - 220px); /* 左カラム除いた幅 */
+      text-align: center;
+      padding: 15px;
+      border-top: 1px solid #ddd;
+      background-color: #fff;
+    }
+    .inline-button {
+      background-color: #00B4D2;
+      color: #fff;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  自社情報
+</header>
+
+<main>
+  <section>
+    <h2>基本情報</h2>
+    <label>郵便番号 <span style="color: red;">*</span>
+      <div class="postal-code-wrapper">
+        <input type="text" placeholder="0000000" />
+        <button class="inline-button">郵便番号から検索</button>
+      </div>
+      <span class="small-note">0000000形式で入力してください</span>
+    </label>
+    <label>住所（1行目必須）
+      <input type="text" placeholder="都道府県・市区町村" />
+      <input type="text" placeholder="番地・建物名" />
+      <input type="text" placeholder="その他" />
+    </label>
+    <label>自社名
+      <input type="text" placeholder="会社名（または番号）を入力してください" />
+      <span class="small-note">会社名（または番号）を入力してください</span>
+    </label>
+    <label>TEL
+      <input type="tel" placeholder="電話番号を入力" />
+    </label>
+    <label>FAX
+      <input type="tel" placeholder="FAX番号を入力" />
+    </label>
+    <label>インボイス登録番号
+      <input type="text" placeholder="T1234567890123" />
+      <span class="small-note">適格請求書（インボイス）に記載が必要な番号です</span>
+    </label>
+    <label>ロゴ
+      <input type="file" accept="image/png, image/jpeg, image/gif" />
+      <span class="small-note">1MBまでのpng/jpg/gifに対応</span>
+    </label>
+    <label>印影
+      <input type="file" accept="image/png, image/jpeg, image/gif" />
+      <span class="small-note">1MBまでのpng/jpg/gifに対応</span>
+    </label>
+  </section>
+
+  <section>
+    <h2>お振込み先</h2>
+    <button class="add-account" onclick="showAccountForm()">＋ 口座の追加</button>
+    <div id="account-form" class="hidden">
+      <label>銀行名
+        <input type="text" placeholder="銀行名を入力" />
+      </label>
+      <label>支店名
+        <input type="text" placeholder="支店名を入力" />
+      </label>
+      <label>口座種別
+        <input type="text" placeholder="普通 / 当座など" />
+      </label>
+      <label>口座番号
+        <input type="text" placeholder="口座番号を入力" />
+      </label>
+      <label>口座名義
+        <input type="text" placeholder="口座名義を入力" />
+      </label>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <button>保存する</button>
+</footer>
+
+<script>
+  function showAccountForm() {
+    document.getElementById('account-form').classList.toggle('hidden');
+  }
+</script>
+
+</body>
+</html>
